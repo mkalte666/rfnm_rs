@@ -1,0 +1,10 @@
+[package]
+name = "rfnm"
+description = "Control you RFNM using rust!"
+version.workspace = true
+authors.workspace = true
+rust-version.workspace = true
+edition.workspace = true
+
+[dependencies]
+rfnm_sys.workspace = true

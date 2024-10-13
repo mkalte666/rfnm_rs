@@ -1,0 +1,12 @@
+[package]
+name = "rfnm_sys"
+description = "Control your RFNM using Rust! (these are the sys bindings to make it work)"
+version.workspace = true
+authors.workspace = true
+rust-version.workspace = true
+edition.workspace = true
+
+[build-dependencies]
+cmake.workspace = true
+cc.workspace = true
+bindgen.workspace = true

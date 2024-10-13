@@ -1,0 +1,18 @@
+[workspace]
+resolver = "2"
+members = [
+    "rfnm/",
+    "rfnm_sys/"
+]
+
+[workspace.package]
+version = "0.1.0"
+authors = ["Malte Kießling"]
+edition = "2021"
+rust-version = "1.80"
+
+[workspace.dependencies]
+cmake = "0.1"
+cc = "1.1"
+bindgen = "0.70"
+rfnm_sys = {path = "rfnm_sys"}
