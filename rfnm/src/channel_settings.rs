@@ -1,7 +1,7 @@
-use crate::{channel_flag_to_number, check_code, RfnmApiError};
+use crate::{check_code, RfnmApiError};
 use rfnm_sys::{
     device_set_rx_channel_freq, device_set_rx_channel_gain, device_set_rx_channel_samp_freq_div,
-    rfnm_channel, DeviceWrapper,
+    DeviceWrapper,
 };
 
 pub struct RxSettings {

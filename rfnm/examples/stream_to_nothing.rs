@@ -1,8 +1,7 @@
 use num_complex::Complex;
 use rfnm::channel_settings::RxSettings;
 use rfnm::device::Device;
-use rfnm::stream::{RxStream, StreamReadInfo};
-use rfnm::RfnmApiError;
+use rfnm::stream::RxStream;
 use rfnm_sys::rfnm_channel;
 use std::error::Error;
 use std::time::{Duration, Instant};
@@ -18,7 +17,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         stream.suggested_buffer_size()
     );
     let mut scratch = vec![Complex::new(0.0, 0.0); stream.suggested_buffer_size()];
-    let mut buffers = [scratch.as_mut_slice()];
+    let buffers = [scratch.as_mut_slice()];
     // before we start, lets make sure we are somewhat sanely setup though
     let ch_settings = RxSettings::default();
     if let Err(e) = stream
@@ -62,5 +61,4 @@ fn main() -> Result<(), Box<dyn Error>> {
             }
         }
     }
-    Ok(())
 }

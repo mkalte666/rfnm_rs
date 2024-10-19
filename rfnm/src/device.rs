@@ -2,9 +2,8 @@ use crate::channel_settings::RxSettings;
 use crate::{channel_flag_to_number, check_code, RfnmApiError};
 use rfnm_sys::{
     device_connect_usb, device_free, device_get_rx_channel, device_get_rx_channel_count,
-    device_get_tx_channel_count, device_rx_work_stop, device_set, device_set_rx_channel_active,
-    device_set_tx_channel_active, device_tx_work_stop, rfnm_api_rx_ch, rfnm_ch_enable,
-    rfnm_ch_stream, rfnm_channel, DeviceWrapper, WrappedThrownError,
+    device_rx_work_stop, device_set_rx_channel_active, device_tx_work_stop, rfnm_api_rx_ch,
+    rfnm_ch_enable, rfnm_ch_stream, rfnm_channel, DeviceWrapper, WrappedThrownError,
 };
 use thiserror::Error;
 
@@ -44,9 +43,9 @@ impl Device {
                         true,
                     ))?;
                 }
-                for i in 0..device_get_tx_channel_count(device_wrapper) {
-                    //check_code(device_set_tx_channel_active(device_wrapper,i,rfnm_ch_enable::RFNM_CH_OFF, rfnm_ch_stream::RFNM_CH_STREAM_OFF, true))?;
-                }
+                //for i in 0..device_get_tx_channel_count(device_wrapper) {
+                //check_code(device_set_tx_channel_active(device_wrapper,i,rfnm_ch_enable::RFNM_CH_OFF, rfnm_ch_stream::RFNM_CH_STREAM_OFF, true))?;
+                //}
             }
             Ok(Self { device_wrapper })
         }
