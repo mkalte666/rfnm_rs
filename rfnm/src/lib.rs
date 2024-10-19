@@ -1,90 +1,102 @@
-use std::ffi::{CStr};
+pub mod channel_settings;
+pub mod device;
+pub mod hwinfo;
+pub mod stream;
+
+use crate::hwinfo::HwInfo;
+use rfnm_sys::{rfnm_api_failcode, rfnm_channel, rfnm_dev_hwinfo, WrappedThrownError};
+use std::ffi::CStr;
 use std::mem::MaybeUninit;
-use rfnm_sys::{rfnm_dev_hwinfo, rfnm_dev_hwinfo_bit};
-
-#[derive(Debug,Clone)]
-pub struct HwInfo {
-    pub protocol_version : u32,
-    pub motherboard: BoardInfo,
-    pub daughterboards: [Option<BoardInfo>; 2],
-    pub clock_info: ClockInfo,
-}
-
-#[derive(Debug,Clone)]
-pub struct BoardInfo {
-    pub id: u8,
-    pub revision : u8,
-    pub serial: [u8;9],
-    pub name: String,
-    pub mac_addr: Option<[u8;6]>,
-    pub channel_counts: ChannelCounts,
-}
-
-
-impl From<rfnm_dev_hwinfo> for HwInfo {
-    fn from(value: rfnm_dev_hwinfo) -> Self {
-        let db1 = if value.daughterboard[0].board_id == 0 {
-            None
-        } else {
-            Some(value.daughterboard[0].into())
-        };
-        let db2 = if value.daughterboard[1].board_id == 0 {
-            None
-        } else {
-            Some(value.daughterboard[1].into())
-        };
-        HwInfo {
-            protocol_version: value.protocol_version,
-            motherboard: value.motherboard.into(),
-            daughterboards: [db1,db2],
-            clock_info: ClockInfo { dcs_clk: value.clock.dcs_clk },
-        }
-    }
-}
-
-impl From<rfnm_dev_hwinfo_bit> for BoardInfo {
-    fn from(value: rfnm_dev_hwinfo_bit) -> Self {
-        let name_cstr = unsafe {CStr::from_ptr(value.user_readable_name.as_ptr())};
-        let name = String::from_utf8_lossy(name_cstr.to_bytes()).to_string();
-        Self {
-            id: value.board_id,
-            revision: value.board_revision_id,
-            serial: value.serial_number,
-            name,
-            mac_addr: Some(value.mac_addr),
-            channel_counts: ChannelCounts {
-                rx: value.rx_ch_cnt,
-                tx: value.tx_ch_cnt
-            },
-        }
-    }
-}
-
-#[derive(Debug,Clone)]
-pub struct ClockInfo {
-    pub dcs_clk: u64
-}
-
-#[derive(Debug,Clone)]
-pub struct ChannelCounts {
-    pub rx: u8,
-    pub tx: u8
-}
-
+use thiserror::Error;
 
 /// Discover all connected rfnm devices.
-pub fn discover_usb_boards() -> Vec<HwInfo>
-{
+pub fn discover_usb_boards() -> Vec<HwInfo> {
     let mut dst = Vec::new();
     unsafe {
-        let board_count = rfnm_sys::find_usb_devices(std::ptr::null_mut(),0);
-        let mut dst_vec = vec![MaybeUninit::uninit();board_count];
-        let actual_count = rfnm_sys::find_usb_devices(dst_vec.as_mut_ptr() as *mut rfnm_dev_hwinfo, dst_vec.len());
+        let board_count = rfnm_sys::find_usb_devices(std::ptr::null_mut(), 0);
+        let mut dst_vec = vec![MaybeUninit::uninit(); board_count];
+        let actual_count =
+            rfnm_sys::find_usb_devices(dst_vec.as_mut_ptr() as *mut rfnm_dev_hwinfo, dst_vec.len());
         for i in 0..actual_count {
-            let raw_hw_info : rfnm_dev_hwinfo = dst_vec[i].assume_init();
+            let raw_hw_info: rfnm_dev_hwinfo = dst_vec[i].assume_init();
             dst.push(raw_hw_info.into())
         }
     }
 
     dst
+}
+
+#[derive(Debug, Error)]
+pub enum RfnmApiError {
+    #[error("The RFNM Api threw an exception: {0}")]
+    ApiException(String),
+    #[error("Read buffer count {0} does not match stream channel count of {1}")]
+    BufferCountMismatch(usize, usize),
+    #[error("Buffer sizes in stream buffers do not match. They must all be the same")]
+    BufferSizeMismatch,
+    #[error("Probing failed")]
+    ProbeFail,
+    #[error("Tuning failed")]
+    TuneFail,
+    #[error("Gain set failed. Make sure the value is supported")]
+    GainFail,
+    #[error("Timeout")]
+    Timeout,
+    #[error("Usb failed")]
+    UsbFail,
+    #[error("DqbufOverflow")]
+    DqbufOverflow,
+    #[error("Operation is not supported")]
+    NotSupported,
+    #[error("A software update is required ")]
+    SoftwareUpgradeRequred,
+    #[error("RFNM_API_DQBUF_OVERFLOW")]
+    DqbufNoData,
+    #[error("RFNM_API_DQBUF_NO_DATA")]
+    MinQbufCountNotSatisfied,
+    #[error("RFNM_API_MIN_QBUF_QUEUE_FULL")]
+    MinQbufQueueFull,
+    #[error("Encounterd an unkwon error code: {0}")]
+    Unknown(u32),
+}
+
+impl From<WrappedThrownError> for RfnmApiError {
+    fn from(value: WrappedThrownError) -> Self {
+        let c_str = unsafe { CStr::from_ptr(value.message.as_ptr()) };
+        let str = String::from_utf8_lossy(c_str.to_bytes());
+        RfnmApiError::ApiException(str.to_string())
+    }
+}
+
+pub fn check_code(code: rfnm_api_failcode) -> Result<(), RfnmApiError> {
+    if code == rfnm_api_failcode::RFNM_API_OK {
+        Ok(())
+    } else {
+        Err(match code {
+            rfnm_api_failcode::RFNM_API_PROBE_FAIL => RfnmApiError::ProbeFail,
+            rfnm_api_failcode::RFNM_API_TUNE_FAIL => RfnmApiError::TuneFail,
+            rfnm_api_failcode::RFNM_API_GAIN_FAIL => RfnmApiError::GainFail,
+            rfnm_api_failcode::RFNM_API_TIMEOUT => RfnmApiError::Timeout,
+            rfnm_api_failcode::RFNM_API_USB_FAIL => RfnmApiError::UsbFail,
+            rfnm_api_failcode::RFNM_API_DQBUF_OVERFLOW => RfnmApiError::DqbufOverflow,
+            rfnm_api_failcode::RFNM_API_NOT_SUPPORTED => RfnmApiError::NotSupported,
+            rfnm_api_failcode::RFNM_API_SW_UPGRADE_REQUIRED => RfnmApiError::SoftwareUpgradeRequred,
+            rfnm_api_failcode::RFNM_API_DQBUF_NO_DATA => RfnmApiError::DqbufNoData,
+            rfnm_api_failcode::RFNM_API_MIN_QBUF_CNT_NOT_SATIFIED => {
+                RfnmApiError::MinQbufCountNotSatisfied
+            }
+            rfnm_api_failcode::RFNM_API_MIN_QBUF_QUEUE_FULL => RfnmApiError::MinQbufQueueFull,
+            rfnm_api_failcode(code) => RfnmApiError::Unknown(code as u32),
+        })
+    }
+}
+
+pub fn channel_flag_to_number(channel: rfnm_channel) -> Option<u32> {
+    for i in 0..7 {
+        if channel.0 == (1 << i) {
+            return Some(i);
+        }
+    }
+
+    None
 }

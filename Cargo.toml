@@ -16,3 +16,5 @@ cmake = "0.1"
 cc = "1.1"
 bindgen = "0.70"
 rfnm_sys = {path = "rfnm_sys"}
+thiserror = "1.0"
+num-complex = "0.4"

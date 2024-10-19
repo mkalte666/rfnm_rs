@@ -8,3 +8,5 @@ edition.workspace = true
 
 [dependencies]
 rfnm_sys.workspace = true
+thiserror.workspace = true
+num-complex.workspace = true

@@ -1,7 +1,7 @@
-use std::env;
-use std::path::PathBuf;
 use bindgen::{Bindings, EnumVariation};
 use cmake;
+use std::env;
+use std::path::PathBuf;
 
 fn main() {
     // We need the rfnm lib and our wrapper
@@ -28,7 +28,6 @@ fn main() {
 
     // we have everything build except the bindgen
 
-
     let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
     gen_bindings()
         .write_to_file(out_path.join("librfnm_wrap.rs"))
@@ -40,14 +39,19 @@ fn main() {
     println!("cargo:rerun-if-changed=librfnm");
 }
 
-pub fn gen_bindings() -> Bindings
-{
+pub fn gen_bindings() -> Bindings {
     bindgen::Builder::default()
         .header("librfnm_wrap/librfnm_wrap.hpp")
         .allowlist_file("librfnm_wrap/librfnm_wrap.hpp")
-        .default_enum_style(EnumVariation::NewType { is_bitfield: false, is_global: false })
+        .default_enum_style(EnumVariation::NewType {
+            is_bitfield: false,
+            is_global: false,
+        })
         .bitfield_enum("rfnm::channel")
+        .allowlist_item("rfnm::channel")
+        .allowlist_item("rfnm::stream_format")
         .parse_callbacks(Box::new(bindgen::CargoCallbacks::new()))
+        .derive_default(true)
         .generate()
         .expect("Failed to generate bindings")
 }
