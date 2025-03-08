@@ -1,4 +1,4 @@
-use crate::channel_settings::RxSettings;
+use crate::channel_settings::{RxChannelInfo, RxChannelSettings};
 use crate::{RfnmApiError, channel_flag_to_number, check_code};
 use rfnm_sys::{
     DeviceWrapper,
@@ -40,7 +40,7 @@ impl Device {
                     check_code(device_get_rx_channel(device_wrapper, i, &mut channel_info))?;
                     let valid_center =
                         channel_info.freq_min + (channel_info.freq_max - channel_info.freq_min) / 2;
-                    let settings = RxSettings {
+                    let settings = RxChannelSettings {
                         frequency: valid_center,
                         ..Default::default()
                     };
@@ -68,10 +68,19 @@ impl Device {
     pub fn set_rx_settings(
         &self,
         channel: rfnm_channel,
-        settings: &RxSettings,
+        settings: &RxChannelSettings,
     ) -> Result<(), RfnmApiError> {
         unsafe {
             settings.apply_to_device(
+                self.device_wrapper,
+                channel_flag_to_number(channel).unwrap_or(0),
+            )
+        }
+    }
+
+    pub fn get_rx_settings(&self, channel: rfnm_channel) -> Result<RxChannelInfo, RfnmApiError> {
+        unsafe {
+            RxChannelInfo::from_device(
                 self.device_wrapper,
                 channel_flag_to_number(channel).unwrap_or(0),
             )

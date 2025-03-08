@@ -139,6 +139,26 @@ rfnm_api_failcode device_set_rx_channel_gain(DeviceWrapper* dev, uint32_t channe
   return dev->dev->set_rx_channel_gain(channel,gain,apply);
 }
 
+rfnm_api_failcode device_set_rx_channel_agc(DeviceWrapper* dev, uint32_t channel, rfnm_agc_type agc, bool apply)
+{
+  return dev->dev->set_rx_channel_agc(channel,agc,apply);
+}
+
+rfnm_api_failcode device_set_rx_channel_fm_notch(DeviceWrapper* dev, uint32_t channel, rfnm_fm_notch fm_notch, bool apply)
+{
+  return dev->dev->set_rx_channel_fm_notch(channel,fm_notch,apply);
+}
+
+rfnm_api_failcode device_set_rx_channel_bias_tee(DeviceWrapper* dev, uint32_t channel, rfnm_bias_tee bias_tee, bool apply)
+{
+  return dev->dev->set_rx_channel_bias_tee(channel,bias_tee,apply);
+}
+
+rfnm_api_failcode device_set_rx_channel_path(DeviceWrapper* dev, uint32_t channel, rfnm_rf_path path, bool apply)
+{
+  return dev->dev->set_rx_channel_path(channel,path,apply);
+}
+
   StreamWrapper* stream_create(DeviceWrapper* dev, uint8_t ch_ids, WrappedThrownError* err)
   {
     clear_thrown_err_wrapper(err);

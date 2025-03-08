@@ -36,6 +36,10 @@ rfnm_api_failcode device_set_tx_channel_active(DeviceWrapper* dev, uint32_t chan
 rfnm_api_failcode device_set_rx_channel_samp_freq_div(DeviceWrapper* dev, uint32_t channel, int16_t m, int16_t n, bool apply);
 rfnm_api_failcode device_set_rx_channel_gain(DeviceWrapper* dev, uint32_t channel, int8_t gain, bool apply);
 rfnm_api_failcode device_set_rx_channel_freq(DeviceWrapper* dev, uint32_t channel, int64_t freq, bool apply);
+rfnm_api_failcode device_set_rx_channel_agc(DeviceWrapper* dev, uint32_t channel, rfnm_agc_type agc, bool apply);
+rfnm_api_failcode device_set_rx_channel_fm_notch(DeviceWrapper* dev, uint32_t channel, rfnm_fm_notch fm_notch, bool apply);
+rfnm_api_failcode device_set_rx_channel_bias_tee(DeviceWrapper* dev, uint32_t channel, rfnm_bias_tee bias_tee, bool apply);
+rfnm_api_failcode device_set_rx_channel_path(DeviceWrapper* dev, uint32_t channel, rfnm_rf_path path, bool apply);
 
 struct StreamWrapper;
 StreamWrapper* stream_create(DeviceWrapper* dev, uint8_t ch_ids, WrappedThrownError* err);

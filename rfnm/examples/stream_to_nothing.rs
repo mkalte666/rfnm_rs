@@ -1,5 +1,4 @@
 use num_complex::Complex;
-use rfnm::channel_settings::RxSettings;
 use rfnm::device::Device;
 use rfnm::stream::RxStream;
 use rfnm_sys::rfnm_channel;
@@ -19,7 +18,10 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut scratch = vec![Complex::new(0.0, 0.0); stream.suggested_buffer_size()];
     let buffers = [scratch.as_mut_slice()];
     // before we start, lets make sure we are somewhat sanely setup though
-    let ch_settings = RxSettings::default();
+    let ch_settings = stream
+        .device()
+        .get_rx_settings(rfnm_channel::CH0)?
+        .to_settings();
     if let Err(e) = stream
         .device()
         .set_rx_settings(rfnm_channel::CH0, &ch_settings)
