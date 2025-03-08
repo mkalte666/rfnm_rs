@@ -145,7 +145,7 @@ impl RxChannelSettings {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct RfPath(rfnm_rf_path);
+pub struct RfPath(pub rfnm_rf_path);
 
 impl Display for RfPath {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {

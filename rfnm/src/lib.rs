@@ -3,8 +3,12 @@ pub mod device;
 pub mod hwinfo;
 pub mod stream;
 
+pub use rfnm_sys;
+
+pub use rfnm_sys::rfnm_channel;
+
 use crate::hwinfo::HwInfo;
-use rfnm_sys::{WrappedThrownError, rfnm_api_failcode, rfnm_channel, rfnm_dev_hwinfo};
+use rfnm_sys::{WrappedThrownError, rfnm_api_failcode, rfnm_dev_hwinfo};
 use std::ffi::CStr;
 use std::mem::MaybeUninit;
 use thiserror::Error;

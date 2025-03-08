@@ -10,6 +10,7 @@ use rfnm_sys::{
     stream_create,
     stream_free,
     stream_read,
+    stream_set_auto_dc_offset,
     stream_start,
     stream_stop,
 };
@@ -101,6 +102,10 @@ impl<T: StreamDataFormat> RxStream<T> {
 
     pub fn suggested_buffer_size(&self) -> usize {
         self.suggested_buffer_size
+    }
+
+    pub fn set_auto_dc_offset(&self, auto: bool, channel: rfnm_channel) {
+        unsafe { stream_set_auto_dc_offset(self.wrapper, auto, channel.0 as u8) }
     }
 
     pub fn start(&self) -> Result<(), RfnmApiError> {
