@@ -1,9 +1,17 @@
-use crate::device::Device;
 use crate::RfnmApiError::BufferCountMismatch;
-use crate::{check_code, RfnmApiError};
+use crate::device::Device;
+use crate::{RfnmApiError, check_code};
 use rfnm_sys::{
-    device_set_stream_format, rfnm_channel, rfnm_stream_format, stream_create, stream_free,
-    stream_read, stream_start, stream_stop, StreamWrapper, WrappedThrownError,
+    StreamWrapper,
+    WrappedThrownError,
+    device_set_stream_format,
+    rfnm_channel,
+    rfnm_stream_format,
+    stream_create,
+    stream_free,
+    stream_read,
+    stream_start,
+    stream_stop,
 };
 use std::ffi::c_void;
 use std::marker::PhantomData;

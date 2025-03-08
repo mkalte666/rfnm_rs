@@ -4,7 +4,7 @@ pub mod hwinfo;
 pub mod stream;
 
 use crate::hwinfo::HwInfo;
-use rfnm_sys::{rfnm_api_failcode, rfnm_channel, rfnm_dev_hwinfo, WrappedThrownError};
+use rfnm_sys::{WrappedThrownError, rfnm_api_failcode, rfnm_channel, rfnm_dev_hwinfo};
 use std::ffi::CStr;
 use std::mem::MaybeUninit;
 use thiserror::Error;

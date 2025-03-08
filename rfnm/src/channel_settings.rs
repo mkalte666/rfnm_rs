@@ -1,7 +1,9 @@
-use crate::{check_code, RfnmApiError};
+use crate::{RfnmApiError, check_code};
 use rfnm_sys::{
-    device_set_rx_channel_freq, device_set_rx_channel_gain, device_set_rx_channel_samp_freq_div,
     DeviceWrapper,
+    device_set_rx_channel_freq,
+    device_set_rx_channel_gain,
+    device_set_rx_channel_samp_freq_div,
 };
 
 pub struct RxSettings {
@@ -26,25 +28,27 @@ impl RxSettings {
         wrapper: *mut DeviceWrapper,
         channel_num: u32,
     ) -> Result<(), RfnmApiError> {
-        check_code(device_set_rx_channel_samp_freq_div(
-            wrapper,
-            channel_num,
-            self.rate_divider_settings.m,
-            self.rate_divider_settings.m,
-            false,
-        ))?;
-        check_code(device_set_rx_channel_gain(
-            wrapper,
-            channel_num,
-            self.gain,
-            false,
-        ))?;
-        check_code(device_set_rx_channel_freq(
-            wrapper,
-            channel_num,
-            self.frequency,
-            true,
-        ))?;
+        unsafe {
+            check_code(device_set_rx_channel_samp_freq_div(
+                wrapper,
+                channel_num,
+                self.rate_divider_settings.m,
+                self.rate_divider_settings.m,
+                false,
+            ))?;
+            check_code(device_set_rx_channel_gain(
+                wrapper,
+                channel_num,
+                self.gain,
+                false,
+            ))?;
+            check_code(device_set_rx_channel_freq(
+                wrapper,
+                channel_num,
+                self.frequency,
+                true,
+            ))?;
+        }
         Ok(())
     }
 }

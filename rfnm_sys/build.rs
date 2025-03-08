@@ -41,6 +41,7 @@ fn main() {
 
 pub fn gen_bindings() -> Bindings {
     bindgen::Builder::default()
+        .clang_args(["-I", "librfnm/include/"])
         .header("librfnm_wrap/librfnm_wrap.hpp")
         .allowlist_file("librfnm_wrap/librfnm_wrap.hpp")
         .default_enum_style(EnumVariation::NewType {

@@ -1,9 +1,19 @@
 use crate::channel_settings::RxSettings;
-use crate::{channel_flag_to_number, check_code, RfnmApiError};
+use crate::{RfnmApiError, channel_flag_to_number, check_code};
 use rfnm_sys::{
-    device_connect_usb, device_free, device_get_rx_channel, device_get_rx_channel_count,
-    device_rx_work_stop, device_set_rx_channel_active, device_tx_work_stop, rfnm_api_rx_ch,
-    rfnm_ch_enable, rfnm_ch_stream, rfnm_channel, DeviceWrapper, WrappedThrownError,
+    DeviceWrapper,
+    WrappedThrownError,
+    device_connect_usb,
+    device_free,
+    device_get_rx_channel,
+    device_get_rx_channel_count,
+    device_rx_work_stop,
+    device_set_rx_channel_active,
+    device_tx_work_stop,
+    rfnm_api_rx_ch,
+    rfnm_ch_enable,
+    rfnm_ch_stream,
+    rfnm_channel,
 };
 use thiserror::Error;
 

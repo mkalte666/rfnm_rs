@@ -8,13 +8,13 @@ members = [
 [workspace.package]
 version = "0.1.0"
 authors = ["Malte Kießling"]
-edition = "2021"
-rust-version = "1.80"
+edition = "2024"
+rust-version = "1.85"
 
 [workspace.dependencies]
 cmake = "0.1"
 cc = "1.1"
-bindgen = "0.70"
+bindgen = "0.71.1"
 rfnm_sys = {path = "rfnm_sys"}
-thiserror = "1.0"
+thiserror = "2.0"
 num-complex = "0.4"
